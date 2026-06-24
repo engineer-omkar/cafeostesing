@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CafeOS Menu</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0..200&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Drawer -->
+  <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+
+  <aside class="drawer" id="drawer">
+    <button class="drawer-close" onclick="closeDrawer()">×</button>
+
+    <img src="assets/images/logo.png" class="drawer-logo" alt="Cafe Logo">
+
+    <button onclick="showScreen('menuScreen')">Home</button>
+    <button onclick="showScreen('offersScreen')">Offers</button>
+    <button onclick="showScreen('statusScreen')">Order Status</button>
+    <button onclick="callWaiter()">Call Waiter</button>
+    <button onclick="closeDrawer()">About Cafe</button>
+  </aside>
+
+  <!-- MENU SCREEN -->
+  <section id="menuScreen" class="screen active">
+
+    <header class="header">
+      <button class="icon-btn" onclick="openDrawer()">
+        <span class="material-symbols-rounded">menu</span>
+      </button>
+
+      <img src="assets/images/logo.png" class="logo" alt="Cafe Logo">
+
+      <button class="icon-btn">
+        <span class="material-symbols-rounded">notifications</span>
+      </button>
+    </header>
+
+    <div class="table-banner">
+      <div>
+        <span>Table No.</span>
+        <h1>12</h1>
+      </div>
+      <p>We serve happiness<br>You enjoy the taste!</p>
+    </div>
+
+    <div class="search-row">
+      <input id="searchInput" type="text" />
+      <button onclick="toggleFilter()">
+        <span class="material-symbols-rounded">tune</span>
+      </button>
+    </div>
+
+    <div class="filter-panel" id="filterPanel">
+      <button class="filter active" onclick="setFilter('all', this)">All</button>
+      <button class="filter" onclick="setFilter('veg', this)">Veg</button>
+      <button class="filter" onclick="setFilter('nonveg', this)">Non-Veg</button>
+      <button class="filter" onclick="setFilter('spicy', this)">Spicy</button>
+    </div>
+
+    <div class="sticky-menu">
+      <div class="category-row" id="categoryRow"></div>
+    </div>
+
+    <main class="food-area">
+      <div class="section-title">
+        <h3 id="sectionTitle">Popular Items</h3>
+        <button onclick="showScreen('offersScreen')">View All →</button>
+      </div>
+
+      <div class="offer-mini" onclick="showScreen('offersScreen')">
+        <small>SUPER SAVER</small>
+        <h2>Up to 20% OFF</h2>
+        <p>On all burgers</p>
+      </div>
+
+      <div id="foodList"></div>
+    </main>
+
+  </section>
+
+  <!-- FOOD DETAIL SCREEN -->
+  <section id="detailScreen" class="screen detail-screen">
+
+    <div class="detail-image-wrap">
+      <button class="back-btn" onclick="showScreen('menuScreen')">
+        <span class="material-symbols-rounded">arrow_back</span>
+      </button>
+
+      <button class="heart-btn">
+        <span class="material-symbols-rounded">favorite</span>
+      </button>
+
+      <img id="detailImage" src="" alt="Food Image">
+    </div>
+
+    <div class="detail-card">
+      <span id="detailTag" class="tag">BESTSELLER</span>
+      <h2 id="detailName"></h2>
+      <h3 id="detailPrice"></h3>
+      <p id="detailDesc"></p>
+
+      <h4>Choose Spice Level</h4>
+
+      <div class="chips">
+        <button class="chip active" onclick="selectChip(this)">Mild</button>
+        <button class="chip" onclick="selectChip(this)">Medium</button>
+        <button class="chip" onclick="selectChip(this)">Spicy</button>
+      </div>
+
+      <h4>Add Extras</h4>
+
+      <label class="extra">
+        <input type="checkbox" data-price="20" onchange="updateDetailTotal()">
+        <span>Extra Cheese</span>
+        <b>+ ₹20</b>
+      </label>
+
+      <label class="extra">
+        <input type="checkbox" data-price="35" onchange="updateDetailTotal()">
+        <span>Extra Patty</span>
+        <b>+ ₹35</b>
+      </label>
+
+      <label class="extra">
+        <input type="checkbox" data-price="10" onchange="updateDetailTotal()">
+        <span>Peri Peri Sauce</span>
+        <b>+ ₹10</b>
+      </label>
+
+      <div class="detail-bottom">
+        <div class="qty-large">
+          <button onclick="detailQtyChange(-1)">−</button>
+          <b id="detailQty">1</b>
+          <button onclick="detailQtyChange(1)">+</button>
+        </div>
+
+        <button class="main-btn" onclick="addDetailToCart()">
+          Add to Cart <span id="detailTotal">₹0</span>
+        </button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- CART SCREEN -->
+  <section id="cartScreen" class="screen">
+
+    <div class="page-head">
+      <button onclick="showScreen('menuScreen')">
+        <span class="material-symbols-rounded">arrow_back</span>
+      </button>
+
+      <h3>Your Cart</h3>
+
+      <button onclick="clearCart()">Clear</button>
+    </div>
+
+    <div class="discount-box">
+      <p>Add items worth ₹182 more to get <b>10% OFF</b></p>
+      <div><span></span></div>
+    </div>
+
+    <div id="cartItems"></div>
+
+    <div class="coupon-box">
+      <input id="couponInput" placeholder="Enter coupon code">
+      <button onclick="applyCoupon()">Apply</button>
+    </div>
+
+    <div class="bill-box">
+      <p><span>Subtotal</span><b id="subtotal">₹0</b></p>
+      <p><span>Packaging Charges</span><b>₹20</b></p>
+      <p><span>Discount</span><b id="discountAmount">₹0</b></p>
+      <h3><span>Total Amount</span><b id="finalTotal">₹0</b></h3>
+    </div>
+
+    <button class="checkout-btn" onclick="placeOrder()">Proceed to Checkout</button>
+
+  </section>
+
+  <!-- OFFERS SCREEN -->
+  <section id="offersScreen" class="screen">
+
+    <div class="page-head">
+      <button onclick="showScreen('menuScreen')">
+        <span class="material-symbols-rounded">arrow_back</span>
+      </button>
+
+      <h3>Offers & Deals</h3>
+      <span></span>
+    </div>
+
+    <div class="main-offer"></div>
+
+    <h3>All Offers</h3>
+
+    <div class="offer-card">
+      10% OFF
+      <small>Use Code: AROMA10</small>
+    </div>
+
+    <div class="offer-card blue">
+      FREE COLD COFFEE
+      <small>On orders above ₹249</small>
+    </div>
+
+    <div class="offer-card pink">
+      15% OFF
+      <small>Use Code: FIRST15</small>
+    </div>
+
+    <div class="offer-card">
+      COMBO OFFER
+      <small>Burger + Fries + Drink starting @ ₹199</small>
+    </div>
+
+  </section>
+
+  <!-- ORDER STATUS SCREEN -->
+  <section id="statusScreen" class="screen">
+
+    <div class="page-head">
+      <button onclick="showScreen('menuScreen')">
+        <span class="material-symbols-rounded">arrow_back</span>
+      </button>
+
+      <h3>Order Status</h3>
+      <span></span>
+    </div>
+
+    <div class="status-card">
+      <h2>✓ Order Confirmed</h2>
+      <p>Order ID</p>
+      <h3 id="orderId">#ORD-10045</h3>
+      <p>Estimated Time: 25 - 30 mins</p>
+    </div>
+
+    <div class="timeline">
+      <div class="done">
+        <b>Order Confirmed</b>
+        <span>10:30 AM</span>
+        <p>Your order has been confirmed</p>
+      </div>
+
+      <div class="done">
+        <b>Preparing Your Order</b>
+        <span>10:32 AM</span>
+        <p>Our chef is preparing your order</p>
+      </div>
+
+      <div>
+        <b>Order On The Way</b>
+        <span>10:45 AM</span>
+        <p>Your order is on the way</p>
+      </div>
+
+      <div>
+        <b>Order Delivered</b>
+        <span>--:--</span>
+        <p>Enjoy your meal!</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- FLOATING CART -->
+  <div class="cart-bar compact" id="cartBar" onclick="expandCartBar()">
+
+    <div class="bag">
+      <span class="material-symbols-rounded">shopping_bag</span>
+      <b id="cartCount">0</b>
+    </div>
+
+    <div class="cart-info">
+      <b id="cartText">0 Items</b>
+      <span id="cartTotal">₹0</span>
+    </div>
+
+    <button onclick="event.stopPropagation(); showCart()">View Cart →</button>
+  </div>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="bottom-nav">
+
+    <button class="nav-item active" onclick="showScreen('menuScreen')">
+      <span class="material-symbols-rounded">restaurant_menu</span>
+      <small>Menu</small>
+    </button>
+
+    <button class="nav-item" onclick="showScreen('offersScreen')">
+      <span class="material-symbols-rounded">local_offer</span>
+      <small>Offers</small>
+    </button>
+
+    <button class="nav-item" onclick="showScreen('statusScreen')">
+      <span class="material-symbols-rounded">receipt_long</span>
+      <small>Orders</small>
+    </button>
+
+    <button class="nav-item" onclick="callWaiter()">
+      <span class="material-symbols-rounded">notifications_active</span>
+      <small>Waiter</small>
+    </button>
+
+    <button class="nav-item" onclick="openDrawer()">
+      <span class="material-symbols-rounded">grid_view</span>
+      <small>More</small>
+    </button>
+
+  </nav>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
